@@ -4,28 +4,25 @@ This repository contains the latest builds of the DroidRun Portal Android app.
 
 ## Download Latest APK
 
-Download the latest APK: [app-debug-latest.apk](https://github.com/codedroid-team/droidrun-portal-releases/raw/main/app-debug-latest.apk)
+Download the latest APK: [app-debug.apk](https://github.com/codedroid-team/droidrun-portal-releases/raw/main/app-debug.apk)
 
 Or visit the [Releases](https://github.com/codedroid-team/droidrun-portal-releases/releases/latest) page.
 
 ## Direct Download URL for Scripts
 
 Use this URL in your scripts to always get the latest build:
-
 ```
-https://github.com/codedroid-team/droidrun-portal-releases/raw/main/app-debug-latest.apk
+https://github.com/codedroid-team/droidrun-portal-releases/raw/main/app-debug.apk
 ```
 
 Example curl command:
-
 ```bash
-curl -L -o app-debug.apk https://github.com/codedroid-team/droidrun-portal-releases/raw/main/app-debug-latest.apk
+curl -L -o app-debug.apk https://github.com/codedroid-team/droidrun-portal-releases/raw/main/app-debug.apk
 ```
 
 Example wget command:
-
 ```bash
-wget https://github.com/codedroid-team/droidrun-portal-releases/raw/main/app-debug-latest.apk
+wget https://github.com/codedroid-team/droidrun-portal-releases/raw/main/app-debug.apk
 ```
 
 ## Installation
