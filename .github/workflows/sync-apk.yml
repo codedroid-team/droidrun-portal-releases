@@ -14,11 +14,11 @@ jobs:
       - name: Checkout public repo
         uses: actions/checkout@v4
 
-      - name: Download APK from private repo
+      - name: Download and extract APK
         env:
           GH_TOKEN: ${{ secrets.PRIVATE_REPO_PAT }}
         run: |
-          # Get the latest workflow run that built the APK
+          # Get the latest successful workflow run
           WORKFLOW_RUN=$(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
@@ -27,19 +27,17 @@ jobs:
 
           echo "Latest workflow run: $WORKFLOW_RUN"
 
-          # Download the artifact
+          # Download and extract artifact to temp directory
+          mkdir -p temp_apk
           gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "/repos/${{ secrets.PRIVATE_REPO_FULL_NAME }}/actions/runs/$WORKFLOW_RUN/artifacts" \
             --jq '.artifacts[] | select(.name == "app-debug") | .archive_download_url' \
-            | xargs -I {} gh api {} > app-debug.zip
+            | xargs -I {} gh api {} > temp_apk/app-debug.zip
 
-          # Extract the APK
+          cd temp_apk
           unzip -o app-debug.zip
-
-          # Debug: List files to see what was extracted
-          echo "Files after extraction:"
           ls -la
 
       - name: Commit and push APK
@@ -47,19 +45,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Find the extracted APK file
-          APK_FILE=$(find . -name "*.apk" -not -path "./.git/*" | head -n 1)
-
-          if [ -z "$APK_FILE" ]; then
-            echo "Error: No APK file found!"
-            exit 1
-          fi
-
-          echo "Found APK: $APK_FILE"
-
-          # Replace with new APK
-          rm -f app-debug.apk
-          cp "$APK_FILE" app-debug.apk
+          # Move the extracted APK to root
+          mv temp_apk/app-debug.apk app-debug.apk
+          rm -rf temp_apk
 
           git add app-debug.apk
           git diff --staged --quiet || git commit -m "Update app-debug.apk [skip ci]"
