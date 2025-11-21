@@ -42,10 +42,6 @@ jobs:
           echo "Files after extraction:"
           ls -la
 
-      - name: Get build timestamp
-        id: timestamp
-        run: echo "timestamp=$(date +%Y%m%d-%H%M%S)" >> $GITHUB_OUTPUT
-
       - name: Commit and push APK
         run: |
           git config user.name "github-actions[bot]"
@@ -61,15 +57,12 @@ jobs:
 
           echo "Found APK: $APK_FILE"
 
-          # Remove old APK files
-          rm -f app-debug-*.apk app-debug-latest.apk
+          # Replace with new APK
+          rm -f app-debug.apk
+          cp "$APK_FILE" app-debug.apk
 
-          # Copy and rename the new APK
-          cp "$APK_FILE" app-debug-${{ steps.timestamp.outputs.timestamp }}.apk
-          cp "$APK_FILE" app-debug-latest.apk
-
-          git add app-debug-*.apk
-          git diff --staged --quiet || git commit -m "Update APK from private repo build [skip ci]"
+          git add app-debug.apk
+          git diff --staged --quiet || git commit -m "Update app-debug.apk [skip ci]"
           git push
 
       - name: Create or update release
@@ -79,11 +72,8 @@ jobs:
           name: Latest Build
           body: |
             Latest APK build from private repository
-            Build timestamp: ${{ steps.timestamp.outputs.timestamp }}
 
-            Download: [app-debug-latest.apk](https://github.com/${{ github.repository }}/raw/main/app-debug-latest.apk)
-          files: |
-            app-debug-latest.apk
-            app-debug-${{ steps.timestamp.outputs.timestamp }}.apk
+            Download: [app-debug.apk](https://github.com/${{ github.repository }}/raw/main/app-debug.apk)
+          files: app-debug.apk
           draft: false
           prerelease: false
