@@ -38,6 +38,10 @@ jobs:
           # Extract the APK
           unzip -o app-debug.zip
 
+          # Debug: List files to see what was extracted
+          echo "Files after extraction:"
+          ls -la
+
       - name: Get build timestamp
         id: timestamp
         run: echo "timestamp=$(date +%Y%m%d-%H%M%S)" >> $GITHUB_OUTPUT
@@ -47,12 +51,24 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Keep only the latest APK
-          rm -f *.apk
-          mv app-debug.apk app-debug-${{ steps.timestamp.outputs.timestamp }}.apk
-          cp app-debug-${{ steps.timestamp.outputs.timestamp }}.apk app-debug-latest.apk
+          # Find the extracted APK file
+          APK_FILE=$(find . -name "*.apk" -not -path "./.git/*" | head -n 1)
 
-          git add *.apk
+          if [ -z "$APK_FILE" ]; then
+            echo "Error: No APK file found!"
+            exit 1
+          fi
+
+          echo "Found APK: $APK_FILE"
+
+          # Remove old APK files
+          rm -f app-debug-*.apk app-debug-latest.apk
+
+          # Copy and rename the new APK
+          cp "$APK_FILE" app-debug-${{ steps.timestamp.outputs.timestamp }}.apk
+          cp "$APK_FILE" app-debug-latest.apk
+
+          git add app-debug-*.apk
           git diff --staged --quiet || git commit -m "Update APK from private repo build [skip ci]"
           git push
 
