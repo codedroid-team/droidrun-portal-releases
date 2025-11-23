@@ -28,9 +28,9 @@ wget https://github.com/codedroid-team/droidrun-portal-releases/raw/main/app-deb
 ## Installation
 
 1. Download the APK file
-2. Enable "Install from unknown sources" in your Android settings
-3. Open the APK file to install
+2. Connect to target emulator and adb install -r <apk-path>
+3. Open the app, enable Accessbility Services + hide overlay
 
 ## Updates
 
-This APK is automatically updated when new builds are pushed to the main branch of the private source repository.
+This APK is automatically updated when changes are made to source code.
